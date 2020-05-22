@@ -125,8 +125,22 @@ bnc.loan.data$loanvalue[is.na(bnc.loan.data$loanvalue) & bnc.loan.data$housing =
 bnc.loan.data$loanvalue[is.na(bnc.loan.data$loanvalue) & bnc.loan.data$loan == 'yes' & bnc.loan.data$housing == 'no'] = lmean
 bnc.loan.data$loanvalue[is.na(bnc.loan.data$loanvalue) & bnc.loan.data$housing == 'yes' & bnc.loan.data$loan == 'yes'] = hlmean
 
+
+# convert numeric variables to factors
+# loan, housing, won, lead, qualified, contacted
+bnc.loan.data$loan = as.factor(bnc.loan.data$loan)
+bnc.loan.data$housing = as.factor(bnc.loan.data$housing)
+bnc.loan.data$won = as.factor(bnc.loan.data$won)
+bnc.loan.data$lead = as.factor(bnc.loan.data$lead)
+bnc.loan.data$qualified = as.factor(bnc.loan.data$qualified)
+bnc.loan.data$contacted = as.factor(bnc.loan.data$contacted)
+
+# month -convert to quarters
+dates = as.Date(bnc.loan.data$date, format = "%m/%d/%Y")
+mquarters =quarters(dates)
+bnc.loan.data$quarter = as.factor(mquarters)
+
 nrow(bnc.loan.data[!complete.cases(bnc.loan.data),])
 summary(bnc.loan.data)
 
 dataQuality()
-
