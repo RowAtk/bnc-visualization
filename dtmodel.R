@@ -16,10 +16,18 @@ data = data.frame(
 )
 View(data)
 
+lead.neg = data[data$lead == 0,] 
+lead.pos = data[data$lead == 1,] 
+
+nrow(lead.neg) # 225
+nrow(lead.pos) # 350
+
+newdata = rbind(lead.neg[0:225,],lead.pos[0:200,])
+
+#newds = sample.split(Y=data$lead, SplitRatio = 1)
 
 # split into train and test
-set.seed(123)
-newDataset <-sample.split(Y=data$lead, SplitRatio = 0.8)
+newDataset <-sample.split(Y=newdata$lead, SplitRatio = 0.7)
 trainSet <- data[newDataset,]
 testSet <- data[!newDataset,]
 
@@ -39,7 +47,8 @@ dtplot = function (model) {
 #####################
 #msplit1 = as.numeric(round(0.01 * count, digits = 0))
 DTmodel1 = rpart(lead ~ ., method = "class", data = trainSet,
-                parms = list (split ="information gain"))
+                parms = list (split ="information gain"), 
+                control = rpart.control(maxdepth = 6)) 
 #
 dtplot(DTmodel1)
 
@@ -76,19 +85,19 @@ test.pred = testSet$lead
 # DTMODEL 1
 predTest1 <- predict(DTmodel1, testSet, type = "class")
 probTest1 <- predict(DTmodel1, testSet, type = "prob")
-results1 = table(actual = test.pred, prediction = predTest)
+results1 = table(actual = test.pred, prediction = predTest1)
 View(results1)
 
 # DTMODEL 2
 predTest2 <- predict(DTmodel2, testSet, type = "class")
 probTest2 <- predict(DTmodel2, testSet, type = "prob")
-results2 = table(actual = test.pred, prediction = predTest)
+results2 = table(actual = test.pred, prediction = predTest2)
 View(results2)
 
 # DTMODEL 3
 predTest3 <- predict(DTmodel3, testSet, type = "class")
 probTest3 <- predict(DTmodel3, testSet, type = "prob")
-results3 = table(actual = test.pred, prediction = predTest)
+results3 = table(actual = test.pred, prediction = predTest3)
 View(results3)
 
 nrow(trainSet[trainSet$lead == 0,])
