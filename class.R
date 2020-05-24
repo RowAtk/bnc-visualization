@@ -4,8 +4,9 @@ library(caTools)
 #library(pROC)
 
 # Step 1 - loading data
-data = read.csv(file = 'HR.csv')
-View(data)
+data2 = read.csv(file = 'HR.csv')
+lead = 
+View(data2)
 summary(data)
 
 nrow(data[data$left == 1,])/nrow(data)
@@ -29,4 +30,16 @@ rpart.plot(DTModel, type = 4, extra = 101, fallen.leaves = T, cex = 0.7)
 
 # Step 4 - use model to make predictions on test data
 pred.test = predict(DTModel, data.test, type = "class")
-prob.test = predict(DTModel, data.test, type = "class")
+prob.test = predict(DTModel, data.test, type = "prob")
+
+View(pred.test)
+View(prob.test)
+
+# STEP 5 - calculate accuracy of model
+acc.table = table(prediction = pred.test, actual = data.test$left)
+View(acc.table)
+
+sum(diag(acc.table))/sum(acc.table)
+
+prob.dominant = ifelse(prob.test[, "0"] > prob.test[, "1"], prob.test[, "0"], prob.test[, "1"])
+View(prob.dominant)

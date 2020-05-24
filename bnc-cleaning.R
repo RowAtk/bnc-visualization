@@ -7,7 +7,7 @@ library('dataQualityR')
 # -----------------------------------------
 
 
-bnc.loan.data = read.csv(
+bnc.loan = read.csv(
   file = 'bnc-loan-ds.csv',
   stringsAsFactors = TRUE,
   header = TRUE,
@@ -20,7 +20,7 @@ dataQuality = function () {
   cat.file <- "dq_cat.csv"
   
   checkDataQuality(
-    data = bnc.loan.data, 
+    data = bnc.loan, 
     out.file.num= num.file, 
     out.file.cat= cat.file
   )
@@ -32,12 +32,12 @@ dataQuality = function () {
   View(dq.cat)
 }
 
-View(bnc.loan.data)
-summary(bnc.loan.data)
+View(bnc.loan)
+summary(bnc.loan)
 
-bnc.loan.data$NPS = NULL
+bnc.loan$NPS = NULL
 
-summary(bnc.loan.data)
+summary(bnc.loan)
 
 # KPIs
 # - balances
@@ -52,7 +52,7 @@ removeNaRows = function(data, col) {
 }
 # missing values
 # RefNum 
-bnc.loan.data = bnc.loan.data[!is.na(bnc.loan.data$RefNum),]
+bnc.loan = bnc.loan[!is.na(bnc.loan$RefNum),]
 
 # Age range (cat)
 # N/A: 0, outliers: F
@@ -62,8 +62,8 @@ bnc.loan.data = bnc.loan.data[!is.na(bnc.loan.data$RefNum),]
 
 # Job (cat)
 # N/A: 7, outlier: F
-bnc.loan.data = removeNaRows(bnc.loan.data, bnc.loan.data$job)
-#bnc.loan.data = bnc.loan.data[!is.na(bnc.loan.data$job),]
+bnc.loan = removeNaRows(bnc.loan, bnc.loan$job)
+#bnc.loan = bnc.loan[!is.na(bnc.loan$job),]
 
 # marital (cat)
 # N/A: 0, outliers: F
@@ -71,35 +71,35 @@ bnc.loan.data = removeNaRows(bnc.loan.data, bnc.loan.data$job)
 # education (cat)
 # N/A: 98, outliers: F
 new_level = "unspecified"
-levels(bnc.loan.data$education) = c(levels(bnc.loan.data$education), new_level)
-bnc.loan.data$education[is.na(bnc.loan.data$education)] = new_level
+levels(bnc.loan$education) = c(levels(bnc.loan$education), new_level)
+bnc.loan$education[is.na(bnc.loan$education)] = new_level
 
 # balance 
 # N/A: 0, outliers: T
-boxplot(bnc.loan.data$balance)
+boxplot(bnc.loan$balance)
 
 # deposit
 # N/A: 17.35%, outliers: T
-boxplot(bnc.loan.data$deposit)
-bnc.loan.data = removeNaRows(bnc.loan.data, bnc.loan.data$deposit)
+boxplot(bnc.loan$deposit)
+bnc.loan = removeNaRows(bnc.loan, bnc.loan$deposit)
 
 # housing, loan, month, date, lead, product, qualified, won (cat)
 # N/A: 0, outliers: F
 
 # duration
 # N/A: 0, outliers:
-boxplot(bnc.loan.data$duration)
+boxplot(bnc.loan$duration)
 
 # contacted
 # N/A: 20%, outliers: F
 # missing values replaced with 0
-bnc.loan.data$contacted[is.na(bnc.loan.data$contacted)] = 0 
+bnc.loan$contacted[is.na(bnc.loan$contacted)] = 0 
 
 # loan value
 # N/A: 17%, outliers: F
-boxplot(bnc.loan.data$loanvalue)
+boxplot(bnc.loan$loanvalue)
 
-data = bnc.loan.data[is.na(bnc.loan.data$loanvalue),]
+data = bnc.loan[is.na(bnc.loan$loanvalue),]
 loanview = data.frame(
   product = data$product,
   housing = data$housing,
@@ -113,34 +113,34 @@ percent = lost_cause/nrow(loanview)
 View(loanview[loanview$housing=='no' & loanview$loan=='no' & loanview$product=='no product',])
 
 # give customers with no loan a loan value of 0, where loanvalue = N/A
-bnc.loan.data$loanvalue[is.na(bnc.loan.data$loanvalue) & bnc.loan.data$housing=='no' & bnc.loan.data$loan=='no'] = 0
+bnc.loan$loanvalue[is.na(bnc.loan$loanvalue) & bnc.loan$housing=='no' & bnc.loan$loan=='no'] = 0
 
 # find mean for records w/ housing alone, loan alone and both
-hmean = round(mean(bnc.loan.data$loanvalue[bnc.loan.data$housing == 'yes' & bnc.loan.data$loan == 'no'], na.rm = TRUE), digits=2)
-lmean = round(mean(bnc.loan.data$loanvalue[bnc.loan.data$loan == 'yes' & bnc.loan.data$housing == 'no'], na.rm = TRUE), digits=2)
-hlmean = round(mean(bnc.loan.data$loanvalue[bnc.loan.data$loan == 'yes' & bnc.loan.data$housing == 'yes'], na.rm = TRUE), digits=2)
+hmean = round(mean(bnc.loan$loanvalue[bnc.loan$housing == 'yes' & bnc.loan$loan == 'no'], na.rm = TRUE), digits=2)
+lmean = round(mean(bnc.loan$loanvalue[bnc.loan$loan == 'yes' & bnc.loan$housing == 'no'], na.rm = TRUE), digits=2)
+hlmean = round(mean(bnc.loan$loanvalue[bnc.loan$loan == 'yes' & bnc.loan$housing == 'yes'], na.rm = TRUE), digits=2)
 
 # replace na values for loanvalue with respective mean
-bnc.loan.data$loanvalue[is.na(bnc.loan.data$loanvalue) & bnc.loan.data$housing == 'yes' & bnc.loan.data$loan == 'no'] = hmean
-bnc.loan.data$loanvalue[is.na(bnc.loan.data$loanvalue) & bnc.loan.data$loan == 'yes' & bnc.loan.data$housing == 'no'] = lmean
-bnc.loan.data$loanvalue[is.na(bnc.loan.data$loanvalue) & bnc.loan.data$housing == 'yes' & bnc.loan.data$loan == 'yes'] = hlmean
+bnc.loan$loanvalue[is.na(bnc.loan$loanvalue) & bnc.loan$housing == 'yes' & bnc.loan$loan == 'no'] = hmean
+bnc.loan$loanvalue[is.na(bnc.loan$loanvalue) & bnc.loan$loan == 'yes' & bnc.loan$housing == 'no'] = lmean
+bnc.loan$loanvalue[is.na(bnc.loan$loanvalue) & bnc.loan$housing == 'yes' & bnc.loan$loan == 'yes'] = hlmean
 
 
 # convert numeric variables to factors
 # loan, housing, won, lead, qualified, contacted
-bnc.loan.data$loan = as.factor(bnc.loan.data$loan)
-bnc.loan.data$housing = as.factor(bnc.loan.data$housing)
-bnc.loan.data$won = as.factor(bnc.loan.data$won)
-bnc.loan.data$lead = as.factor(bnc.loan.data$lead)
-bnc.loan.data$qualified = as.factor(bnc.loan.data$qualified)
-bnc.loan.data$contacted = as.factor(bnc.loan.data$contacted)
+bnc.loan$loan = as.factor(bnc.loan$loan)
+bnc.loan$housing = as.factor(bnc.loan$housing)
+bnc.loan$won = as.factor(bnc.loan$won)
+bnc.loan$lead = as.factor(bnc.loan$lead)
+bnc.loan$qualified = as.factor(bnc.loan$qualified)
+bnc.loan$contacted = as.factor(bnc.loan$contacted)
 
 # month -convert to quarters
-dates = as.Date(bnc.loan.data$date, format = "%m/%d/%Y")
+dates = as.Date(bnc.loan$date, format = "%m/%d/%Y")
 mquarters =quarters(dates)
-bnc.loan.data$quarter = as.factor(mquarters)
+bnc.loan$quarter = as.factor(mquarters)
 
-nrow(bnc.loan.data[!complete.cases(bnc.loan.data),])
-summary(bnc.loan.data)
+nrow(bnc.loan[!complete.cases(bnc.loan),])
+summary(bnc.loan)
 
 dataQuality()
