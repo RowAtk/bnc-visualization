@@ -140,6 +140,15 @@ dates = as.Date(bnc.loan$date, format = "%m/%d/%Y")
 mquarters =quarters(dates)
 bnc.loan$quarter = as.factor(mquarters)
 
+# Make leads data
+leads.data = data.frame(leads = c(0,0,0,0), leadstage=c("leads", "qualified", "contacted", "won") )
+
+leads.data[1,1] = nrow(bnc.loan[bnc.loan$lead == 1,])
+leads.data[2,1] = nrow(bnc.loan[bnc.loan$qualified == 1,])
+leads.data[3,1] = nrow(bnc.loan[bnc.loan$contacted == 1,])
+leads.data[4,1] = nrow(bnc.loan[bnc.loan$won == 1,])
+View(leads.data)
+
 nrow(bnc.loan[!complete.cases(bnc.loan),])
 summary(bnc.loan)
 
