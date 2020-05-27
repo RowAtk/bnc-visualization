@@ -27,7 +27,7 @@ DTmodel<- rpart(left ~ ., method = "class", data = traindata2,
                 parms = list (split ="information gain"), 
                 control = rpart.control(minsplit = 100, maxdepth = 4))  
 
-rpart.plot(DTmodel, type = 3, extra = 3, fallen.leaves = F, cex = 0.6) #extra 2 4 8 101
+rpart.plot(DTmodel, type = 3, extra = 101, fallen.leaves = F, cex = 0.6) #extra 2 4 8 101
 DTmodel
 
 ###STEP 4 - USE THE MODEL TO MAKE PREDICTIONS ON TEST data2

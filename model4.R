@@ -7,43 +7,21 @@ library(imbalance)
 
 data = bnc.loan
 data = data.frame(
-  # education = data$education,
+  education = data$education,
   age = data$age,
-  # marital = data$marital,
-  # job = data$job,
-  # deposit = data$deposit,
+  marital = data$marital,
+  job = data$job,
+  deposit = data$deposit,
   balance = data$balance,
   lead = data$lead
 )
 summary(data)
-#data$lead = as.factor(data$lead)
 
 # split data into train and test
 set.seed(929)
-newset = sample.split(Y=data$lead, SplitRatio = 0.8)
+newset = sample.split(Y=data$lead, SplitRatio = 0.7)
 data.train = data[newset,]
 data.test = data[!newset,]
-
-# oversample
-imbalanceRatio(data.train, "lead")
-
-# random 
-# config: md = 5, no job, info, split = 0.7
-# data.train = rsample(data.train)
-#View(data.train)
-
-#SMOTE
-# config: md = 4, no education, gini, split = 0.8
-data.train = tonumeric(data.train, "lead")
-data.test = tonumeric(data.test, "lead")
-data.train = smotesample(data.train, 0.8, "lead")
-
-# ADSN
-# config: md = N/A, split = 0.8
-# data.train = adasynsample(data.train, 0.8, "lead")
-
-# measure imbalance in target variable
-imbalanceRatio(data.train, "lead")
 
 ##################################
 #   Build Decision Tree Model    #
@@ -52,8 +30,8 @@ DTmodel1 = rpart(
   lead ~ ., 
   method = "class", 
   data = data.train,
-  parms = list (split ="information")
-  # control = rpart.control(maxdepth = 4)
+  parms = list (split ="information"),
+  control = rpart.control(maxdepth = 10)
 )
 
 # plot model

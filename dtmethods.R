@@ -18,17 +18,16 @@ rsample = function (train) {
 
 
 # SMOTE
-
 smotesample = function (train, ratio, classAttr) {
   imbalanceRatio(train, classAttr = classAttr)
+  print(ratio)
   data.train = oversample(train, ratio = ratio, method = "SMOTE", classAttr = classAttr)
 }
 
-# ADSN
-
-adsnsample = function (train, ratio, classAttr) {
+# ADASYN
+adasynsample = function (train, ratio, classAttr) {
   imbalanceRatio(train, classAttr = classAttr)
-  data.train = oversample(train, ratio = ratio, method = "ADSN", classAttr = classAttr)
+  data.train = oversample(train, ratio = ratio, method = "ADASYN", classAttr = classAttr)
 }
 
 ##################################
@@ -39,7 +38,6 @@ adsnsample = function (train, ratio, classAttr) {
 measure.acc = function (actual, predicted) {
   t1 = table(Actual_Value = actual, Predicted_Value = predicted)
   print(t1)
-  View(t1)
   acc = sum(diag(t1))/sum(t1)
   return(acc)
 }
@@ -56,9 +54,10 @@ measure.sens = function (actual, predicted) {
 # Specifity
 measure.spec = function (actual, predicted) {
   t1 = table(Actual_Value = actual, Predicted_Value = predicted)
-  a = t1[2,2]
-  b = t1[2,1]
-  spec = a / (a+b)
+  View(t1)
+  d = t1[2,2]
+  c = t1[2,1]
+  spec = d / (d+c)
   return(spec)
 }
 
@@ -68,6 +67,26 @@ measure.roc = function (actual, prob) {
   plot(ROC, col="purple")
   AUC <- auc(ROC)
   AUC
+}
+
+##################################
+#        Factor to Numeric       #
+##################################
+
+tonumeric = function(data, target) {
+  for (col in colnames(data)) {
+    if(col != target & class(data[[col]]) == "factor") {
+      data[,col] = as.numeric(data[,col])
+    }
+  }
+  return(data)
+}
+
+##################################
+#        Plot DT Model           #
+##################################
+dtplot = function (model) {
+  rpart.plot(model, type = 1, extra = 101, fallen.leaves = T, cex = 0.6) #extra 2 4 8 101
 }
 
 
