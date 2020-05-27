@@ -60,7 +60,7 @@ data.test.pred = predict(DTmodel1, data.test, type = "class")
 data.test.prob = predict(DTmodel1, data.test, type = "prob")
 
 actual = data.test$lead
-results = data.frame(actual = actual, prediction = data.test.pred, probability = data.test.prob)
+results = data.frame(actual = actual, prediction = data.test.pred, probability = prob.dominant(data.test.prob))
 View(results)
 
 ##################################
